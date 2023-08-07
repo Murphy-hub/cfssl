@@ -528,8 +528,9 @@ func CreateTLSConfig(remoteCAs *x509.CertPool, cert *tls.Certificate) *tls.Confi
 		certs = []tls.Certificate{*cert}
 	}
 	return &tls.Config{
-		Certificates: certs,
-		RootCAs:      remoteCAs,
+		Certificates:       certs,
+		RootCAs:            remoteCAs,
+		InsecureSkipVerify: true,
 	}
 }
 

@@ -8,13 +8,12 @@ import (
 
 	"github.com/cloudflare/cfssl/helpers"
 	"github.com/cloudflare/cfssl/transport/core"
-	"github.com/cloudflare/cfssl/transport/roots/system"
 )
 
 // Providers is a mapping of supported providers and the functions
 // that can build them.
 var Providers = map[string]func(map[string]string) ([]*x509.Certificate, error){
-	"system": system.New,
+	"system": NewSystem,
 	"cfssl":  NewCFSSL,
 	"file":   TrustPEM,
 }
@@ -44,7 +43,7 @@ func (ts *TrustStore) Certificates() []*x509.Certificate {
 	return roots
 }
 
-func (ts *TrustStore) addCerts(certs []*x509.Certificate) {
+func (ts *TrustStore) AddCerts(certs []*x509.Certificate) {
 	if ts.roots == nil {
 		ts.roots = map[string]*x509.Certificate{}
 	}
@@ -78,12 +77,12 @@ func New(rootDefs []*core.Root) (*TrustStore, error) {
 	var roots []*x509.Certificate
 
 	if len(rootDefs) == 0 {
-		roots, err = system.New(nil)
+		roots, err = NewSystem(nil)
 		if err != nil {
 			return nil, err
 		}
 
-		store.addCerts(roots)
+		store.AddCerts(roots)
 		return store, nil
 	}
 
@@ -96,7 +95,7 @@ func New(rootDefs []*core.Root) (*TrustStore, error) {
 				break
 			}
 
-			store.addCerts(roots)
+			store.AddCerts(roots)
 		}
 	}
 
